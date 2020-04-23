@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC1090
-set -ueo pipefail
-
 root="$(readlink -f "$(dirname "$0")")"
 
 
@@ -372,21 +370,5 @@ else
 	priv_tool="sudo"
 fi
 
-fails_counter=0
-while true; do
-	exit_code=0
-	${priv_tool} cp "${output_dir}/"* "${spotify_apps_path}"/ 2>&1 | tee "${log_file}" || exit_code=$?
-	if [ $exit_code -ne 0 ] ; then
-		if [ "${priv_tool}" = "${PKEXEC}" ] && grep -q "No authentication agent found." "${log_file}" ; then
-			priv_tool="gksu"
-		else
-			fails_counter=$((fails_counter + 1))
-		fi
-		if [ ${fails_counter} -gt 3 ] ; then
-			break
-		fi
-	else
-		break
-	fi
-done
+cp "${output_dir}/"* "${spotify_apps_path}"/ 2>&1 | tee "${log_file}" || exit_code=$?
 exit ${exit_code}
